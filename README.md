@@ -1,7 +1,3 @@
-Certainly! Here's a sample README file for your automated plant watering system project:
-
----
-
 # Automated Plant Watering System with CAN Bus and FreeRTOS
 
 ## Overview
