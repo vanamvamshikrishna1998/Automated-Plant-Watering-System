@@ -120,6 +120,11 @@ This project implements an automated plant watering system using STM32 microcont
 - **CANReceiveTask**: Receives moisture data from nodes
 - **LCDUpdateTask**: Updates the LCD with received moisture levels
 
+## Block Diagram
+
+![IMG_0787](https://github.com/vanamvamshikrishna1998/Automated-Plant-Watering-System/assets/161431266/152352fa-b7e0-40c7-b5c6-c4ad6b52c239)
+
+
 ## Code Example
 
 ### Node 1: Main File (`main.c`)
