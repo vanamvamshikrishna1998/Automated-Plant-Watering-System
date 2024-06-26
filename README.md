@@ -216,10 +216,6 @@ void StartLCDUpdateTask(void *argument) {
 4. **Connect Hardware**: Connect the hardware components as per the schematic.
 5. **Run the System**: Power on the system to start monitoring and watering plants automatically.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Acknowledgments
 
 - STM32CubeMX and HAL libraries for peripheral configuration.
