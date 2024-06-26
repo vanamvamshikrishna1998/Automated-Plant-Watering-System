@@ -210,7 +210,7 @@ void StartLCDUpdateTask(void *argument) {
 
 ## Usage
 
-1. **Clone the Repository**: `git clone https://github.com/your-username/automated-plant-watering-system.git`
+1. **Clone the Repository**: `git clone https://github.com/vanamvamshikrishna1998/Automated-Plant-Watering-System.git`
 2. **Open the Project**: Open the project in your preferred IDE (e.g., STM32CubeIDE).
 3. **Build and Flash**: Build the project and flash the firmware to the STM32 microcontrollers.
 4. **Connect Hardware**: Connect the hardware components as per the schematic.
