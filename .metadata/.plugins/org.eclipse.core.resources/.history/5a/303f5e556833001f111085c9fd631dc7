@@ -317,10 +317,8 @@ void StartCanTask(void *argument)
   /* Infinite loop */
   while(1){
     /* Prepare CAN data */
-	osMutexAcquire(moistureMutex1Handle, osWaitForever);
     TxData[0] = moistureLevel & 0xFF;
     TxData[1] = (moistureLevel >> 8) & 0xFF;
-    osMutexRelease(moistureMutex1Handle);
     /* Transmit CAN message */
     HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox);
     /* Delay for 1 second */

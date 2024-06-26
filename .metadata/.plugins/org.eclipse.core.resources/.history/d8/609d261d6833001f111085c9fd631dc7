@@ -286,10 +286,8 @@ void StartWateringTask(void *argument)
   /* Infinite loop */
   while(1){
     /* Check if moisture level is below threshold */
-	osMutexAcquire(moistureMutex1Handle, osWaitForever);
-	uint16_t threshold = moistureLevel;
-	osMutexRelease(moistureMutex1Handle);
-    if(threshold < 30){
+	  osMutexAcquire(moistureMutex1Handle, osWaitForever);
+    if(moistureLevel < 30){
       /* Turn on the water pump */
       HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
     } else {
@@ -317,10 +315,8 @@ void StartCanTask(void *argument)
   /* Infinite loop */
   while(1){
     /* Prepare CAN data */
-	osMutexAcquire(moistureMutex1Handle, osWaitForever);
     TxData[0] = moistureLevel & 0xFF;
     TxData[1] = (moistureLevel >> 8) & 0xFF;
-    osMutexRelease(moistureMutex1Handle);
     /* Transmit CAN message */
     HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox);
     /* Delay for 1 second */

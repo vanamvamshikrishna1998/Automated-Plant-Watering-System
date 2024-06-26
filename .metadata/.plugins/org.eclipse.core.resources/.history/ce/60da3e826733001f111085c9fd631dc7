@@ -92,7 +92,6 @@ int main(void)
   sensorTaskHandle = osThreadNew(StartSensorTask, NULL, &sensorTask_attributes);
   wateringTaskHandle = osThreadNew(StartWateringTask, NULL, &wateringTask_attributes);
   canTaskHandle = osThreadNew(StartCanTask, NULL, &canTask_attributes);
-  moistureMutex1Handle = osMutexNew(&moistureMutex1_attributes);
 
   /* Start scheduler */
   osKernelStart();
@@ -260,10 +259,8 @@ void StartSensorTask(void *argument)
     HAL_ADC_Start(&hadc1);
     /* Poll for ADC conversion completion */
     if(HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY) == HAL_OK){
-    	osMutexAcquire(moistureMutex1Handle, osWaitForever);
-		/* Get the ADC converted value */
-		moistureLevel = HAL_ADC_GetValue(&hadc1);
-		osMutexRelease(moistureMutex1Handle);
+      /* Get the ADC converted value */
+      moistureLevel = HAL_ADC_GetValue(&hadc1);
     }
     else{
     	char error_msg[] = "ADC conversion failed!\r\n";
@@ -286,10 +283,7 @@ void StartWateringTask(void *argument)
   /* Infinite loop */
   while(1){
     /* Check if moisture level is below threshold */
-	osMutexAcquire(moistureMutex1Handle, osWaitForever);
-	uint16_t threshold = moistureLevel;
-	osMutexRelease(moistureMutex1Handle);
-    if(threshold < 30){
+    if(moistureLevel < 30){
       /* Turn on the water pump */
       HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
     } else {
@@ -312,15 +306,13 @@ void StartCanTask(void *argument)
   TxHeader.DLC = 2;
   TxHeader.IDE = CAN_ID_STD;
   TxHeader.RTR = CAN_RTR_DATA;
-  TxHeader.StdId = 0x05; // Unique ID for Node 1
+  TxHeader.StdId = 0x0A; // Unique ID for Node 2
 
   /* Infinite loop */
   while(1){
     /* Prepare CAN data */
-	osMutexAcquire(moistureMutex1Handle, osWaitForever);
     TxData[0] = moistureLevel & 0xFF;
     TxData[1] = (moistureLevel >> 8) & 0xFF;
-    osMutexRelease(moistureMutex1Handle);
     /* Transmit CAN message */
     HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox);
     /* Delay for 1 second */

@@ -53,6 +53,11 @@ const osThreadAttr_t canTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for moistureMutex1 */
+osMutexId_t moistureMutex1Handle;
+const osMutexAttr_t moistureMutex1_attributes = {
+  .name = "moistureMutex1"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -87,6 +92,7 @@ int main(void)
   sensorTaskHandle = osThreadNew(StartSensorTask, NULL, &sensorTask_attributes);
   wateringTaskHandle = osThreadNew(StartWateringTask, NULL, &wateringTask_attributes);
   canTaskHandle = osThreadNew(StartCanTask, NULL, &canTask_attributes);
+  moistureMutex1Handle = osMutexNew(&moistureMutex1_attributes);
 
   /* Start scheduler */
   osKernelStart();
@@ -254,8 +260,10 @@ void StartSensorTask(void *argument)
     HAL_ADC_Start(&hadc1);
     /* Poll for ADC conversion completion */
     if(HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY) == HAL_OK){
-      /* Get the ADC converted value */
-      moistureLevel = HAL_ADC_GetValue(&hadc1);
+    	osMutexAcquire(moistureMutex1Handle, osWaitForever);
+		/* Get the ADC converted value */
+		moistureLevel = HAL_ADC_GetValue(&hadc1);
+		osMutexRelease(moistureMutex1Handle);
     }
     else{
     	char error_msg[] = "ADC conversion failed!\r\n";
@@ -278,7 +286,10 @@ void StartWateringTask(void *argument)
   /* Infinite loop */
   while(1){
     /* Check if moisture level is below threshold */
-    if(moistureLevel < 30){
+	osMutexAcquire(moistureMutex1Handle, osWaitForever);
+	uint16_t threshold = moistureLevel;
+	osMutexRelease(moistureMutex1Handle);
+    if(threshold < 30){
       /* Turn on the water pump */
       HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
     } else {
@@ -306,8 +317,10 @@ void StartCanTask(void *argument)
   /* Infinite loop */
   while(1){
     /* Prepare CAN data */
+	osMutexAcquire(moistureMutex1Handle, osWaitForever);
     TxData[0] = moistureLevel & 0xFF;
     TxData[1] = (moistureLevel >> 8) & 0xFF;
+    osMutexRelease(moistureMutex1Handle);
     /* Transmit CAN message */
     HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox);
     /* Delay for 1 second */

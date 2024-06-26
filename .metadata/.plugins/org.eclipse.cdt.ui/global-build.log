@@ -426,3 +426,108 @@ arm-none-eabi-size  Node\ 2.elf
   21368	     24	   8248	  29640	   73c8	Node 2.elf
 Finished building: default.size.stdout
  
+21:55:43 **** Incremental Build of configuration Debug for project Node 1 ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-g++ -o "Node 1.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\Automated Plant Watering System\Node 1\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Node 1.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Finished building target: Node 1.elf
+ 
+arm-none-eabi-size  Node\ 1.elf 
+arm-none-eabi-objdump -h -S Node\ 1.elf  > "Node 1.list"
+   text	   data	    bss	    dec	    hex	filename
+  19368	     24	   8216	  27608	   6bd8	Node 1.elf
+Finished building: default.size.stdout
+ 
+Finished building: Node 1.list
+ 
+21:55:44 **** Incremental Build of configuration Debug for project Node 2 ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-g++ -o "Node 2.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\Automated Plant Watering System\Node 2\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Node 2.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Finished building target: Node 2.elf
+ 
+arm-none-eabi-size  Node\ 2.elf 
+arm-none-eabi-objdump -h -S Node\ 2.elf  > "Node 2.list"
+   text	   data	    bss	    dec	    hex	filename
+  22008	     24	   8248	  30280	   7648	Node 2.elf
+Finished building: default.size.stdout
+ 
+Finished building: Node 2.list
+ 
+21:55:52 **** Incremental Build of configuration Debug for project Node 1 ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-g++ -o "Node 1.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\Automated Plant Watering System\Node 1\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Node 1.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Finished building target: Node 1.elf
+ 
+arm-none-eabi-size  Node\ 1.elf 
+arm-none-eabi-objdump -h -S Node\ 1.elf  > "Node 1.list"
+   text	   data	    bss	    dec	    hex	filename
+  21976	     24	   8248	  30248	   7628	Node 1.elf
+Finished building: default.size.stdout
+ 
+Finished building: Node 1.list
+ 
+21:55:53 **** Incremental Build of configuration Debug for project Node 2 ****
+make -j12 all 
+arm-none-eabi-size  Node\ 2.elf 
+   text	   data	    bss	    dec	    hex	filename
+  22008	     24	   8248	  30280	   7648	Node 2.elf
+Finished building: default.size.stdout
+ 
+22:02:00 **** Incremental Build of configuration Debug for project Node 1 ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-g++ -o "Node 1.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\Automated Plant Watering System\Node 1\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Node 1.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Finished building target: Node 1.elf
+ 
+arm-none-eabi-size  Node\ 1.elf 
+arm-none-eabi-objdump -h -S Node\ 1.elf  > "Node 1.list"
+   text	   data	    bss	    dec	    hex	filename
+  23752	     24	   8248	  32024	   7d18	Node 1.elf
+Finished building: default.size.stdout
+ 
+Finished building: Node 1.list
+ 
+22:02:01 **** Incremental Build of configuration Debug for project Node 2 ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-g++ -o "Node 2.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\Automated Plant Watering System\Node 2\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Node 2.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Finished building target: Node 2.elf
+ 
+arm-none-eabi-size  Node\ 2.elf 
+arm-none-eabi-objdump -h -S Node\ 2.elf  > "Node 2.list"
+   text	   data	    bss	    dec	    hex	filename
+  23800	     24	   8248	  32072	   7d48	Node 2.elf
+Finished building: default.size.stdout
+ 
+Finished building: Node 2.list
+ 
+22:02:04 **** Incremental Build of configuration Debug for project Node 1 ****
+make -j12 all 
+arm-none-eabi-size  Node\ 1.elf 
+   text	   data	    bss	    dec	    hex	filename
+  23752	     24	   8248	  32024	   7d18	Node 1.elf
+Finished building: default.size.stdout
+ 
+22:02:05 **** Incremental Build of configuration Debug for project Node 2 ****
+make -j12 all 
+arm-none-eabi-size  Node\ 2.elf 
+   text	   data	    bss	    dec	    hex	filename
+  23800	     24	   8248	  32072	   7d48	Node 2.elf
+Finished building: default.size.stdout
+ 
+22:02:08 **** Incremental Build of configuration Debug for project Node 1 ****
+make -j12 all 
+arm-none-eabi-size  Node\ 1.elf 
+   text	   data	    bss	    dec	    hex	filename
+  23752	     24	   8248	  32024	   7d18	Node 1.elf
+Finished building: default.size.stdout
+ 
+22:02:09 **** Incremental Build of configuration Debug for project Node 2 ****
+make -j12 all 
+arm-none-eabi-size  Node\ 2.elf 
+   text	   data	    bss	    dec	    hex	filename
+  23800	     24	   8248	  32072	   7d48	Node 2.elf
+Finished building: default.size.stdout
+ 

@@ -312,7 +312,7 @@ void StartCanTask(void *argument)
   TxHeader.DLC = 2;
   TxHeader.IDE = CAN_ID_STD;
   TxHeader.RTR = CAN_RTR_DATA;
-  TxHeader.StdId = 0x05; // Unique ID for Node 1
+  TxHeader.StdId = 0x0A; // Unique ID for Node 1
 
   /* Infinite loop */
   while(1){
