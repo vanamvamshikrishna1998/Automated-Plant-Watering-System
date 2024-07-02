@@ -1,10 +1,10 @@
-16:10:17 **** Incremental Build of configuration Debug for project Node 2 ****
+03:09:39 **** Incremental Build of configuration Debug for project Node 2 ****
 make -j12 all 
 arm-none-eabi-size  Node\ 2.elf 
    text	   data	    bss	    dec	    hex	filename
-  23800	     24	   8248	  32072	   7d48	Node 2.elf
+  23952	     24	   8248	  32224	   7de0	Node 2.elf
 Finished building: default.size.stdout
  
 
-16:10:17 Build Finished. 0 errors, 0 warnings. (took 247ms)
+03:09:40 Build Finished. 0 errors, 0 warnings. (took 248ms)
 

@@ -20,54 +20,67 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include <string.h>
+#include <stdio.h>
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
-UART_HandleTypeDef huart1;
 
 CAN_HandleTypeDef hcan;
+
+UART_HandleTypeDef huart2;
+
+osThreadId moistureTaskHandle;
+osThreadId wateringTaskHandle;
+osThreadId canTaskHandle;
+
+uint16_t moisture_level;
+
 CAN_TxHeaderTypeDef TxHeader;
 
-uint32_t TxMailbox;
 uint8_t TxData[2];
-uint16_t moistureLevel;
 
-/* Definitions for sensorTask */
-osThreadId_t sensorTaskHandle;
-const osThreadAttr_t sensorTask_attributes = {
-  .name = "sensorTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-/* Definitions for wateringTask */
-osThreadId_t wateringTaskHandle;
-const osThreadAttr_t wateringTask_attributes = {
-  .name = "wateringTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
-/* Definitions for canTask */
-osThreadId_t canTaskHandle;
-const osThreadAttr_t canTask_attributes = {
-  .name = "canTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
-/* Definitions for moistureMutex1 */
-osMutexId_t moistureMutex1Handle;
-const osMutexAttr_t moistureMutex1_attributes = {
-  .name = "moistureMutex1"
-};
+uint32_t TxMailbox;
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_CAN_Init(void);
-static void MX_USART1_UART_Init(void);
-void StartSensorTask(void *argument);
-void StartWateringTask(void *argument);
-void StartCanTask(void *argument);
+static void MX_USART2_UART_Init(void);
+void StartMoistureTask(const void *argument);
+void StartWateringTask(const void *argument);
+void StartCanTask(const void *argument);
+
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
@@ -75,32 +88,89 @@ void StartCanTask(void *argument);
   */
 int main(void)
 {
-  /* Initialize the hardware and system clock */
+
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
   SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
-  MX_USART1_UART_Init();
   MX_CAN_Init();
+  MX_USART2_UART_Init();
+  /* USER CODE BEGIN 2 */
 
-  /* Initialize the RTOS kernel */
-  osKernelInitialize();
+  /* USER CODE END 2 */
+
+  /* Create the mutex(es) */
+  /* definition and creation of moistureMutex1 */
+
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  sensorTaskHandle = osThreadNew(StartSensorTask, NULL, &sensorTask_attributes);
-  wateringTaskHandle = osThreadNew(StartWateringTask, NULL, &wateringTask_attributes);
-  canTaskHandle = osThreadNew(StartCanTask, NULL, &canTask_attributes);
-  moistureMutex1Handle = osMutexNew(&moistureMutex1_attributes);
+  /* definition and creation of sensorTask */
+  /* Create the thread(s) */
+  /* definition and creation of sensorTask */
+  osThreadDef(moistureTask, StartMoistureTask, osPriorityNormal, 0, 256);
+    moistureTaskHandle = osThreadCreate(osThread(moistureTask), NULL);
+
+  /* definition and creation of wateringTask */
+    osThreadDef(wateringTask, StartWateringTask, osPriorityAboveNormal, 0, 256);
+      wateringTaskHandle = osThreadCreate(osThread(wateringTask), NULL);
+
+  /* definition and creation of canTask */
+      osThreadDef(canTask, StartCanTask, osPriorityBelowNormal, 0, 256);
+        canTaskHandle = osThreadCreate(osThread(canTask), NULL);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
   osKernelStart();
 
-  /* Infinite loop to keep the main function alive */
+  /* We should never get here as control is now taken by the scheduler */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
   while (1)
   {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
   }
+  /* USER CODE END 3 */
 }
 
 /**
@@ -113,35 +183,44 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
-  /* Configure the main internal regulator output voltage */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
 
-  /* Initializes the CPU, AHB and APB buses clocks */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
-
-  /* Configure the ADC peripheral clock */
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV2;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }
+
+  /** Enables the Clock Security System
+  */
+  HAL_RCC_EnableCSS();
 }
 
 /**
@@ -151,9 +230,19 @@ void SystemClock_Config(void)
   */
 static void MX_ADC1_Init(void)
 {
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
   ADC_ChannelConfTypeDef sConfig = {0};
 
-  /* Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) */
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+
+  /** Common config
+  */
   hadc1.Instance = ADC1;
   hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
@@ -166,7 +255,8 @@ static void MX_ADC1_Init(void)
     Error_Handler();
   }
 
-  /* Configure for the selected ADC regular channel to be converted */
+  /** Configure Regular Channel
+  */
   sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
@@ -174,6 +264,10 @@ static void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
 }
 
 /**
@@ -183,6 +277,14 @@ static void MX_ADC1_Init(void)
   */
 static void MX_CAN_Init(void)
 {
+
+  /* USER CODE BEGIN CAN_Init 0 */
+
+  /* USER CODE END CAN_Init 0 */
+
+  /* USER CODE BEGIN CAN_Init 1 */
+
+  /* USER CODE END CAN_Init 1 */
   hcan.Instance = CAN1;
   hcan.Init.Prescaler = 16;
   hcan.Init.Mode = CAN_MODE_NORMAL;
@@ -199,6 +301,43 @@ static void MX_CAN_Init(void)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN CAN_Init 2 */
+
+  /* USER CODE END CAN_Init 2 */
+
+}
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
 }
 
 /**
@@ -209,123 +348,145 @@ static void MX_CAN_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
-  /* Configure GPIO pin Output Level */
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
 
-  /* Configure GPIO pin : PA1 */
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA1 */
   GPIO_InitStruct.Pin = GPIO_PIN_1;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
-/**
-  * @brief USART Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART1_UART_Init(void)
-{
+/* USER CODE BEGIN 4 */
 
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
+/* USER CODE END 4 */
 
-}
-
+/* USER CODE BEGIN Header_StartSensorTask */
 /**
   * @brief  Function implementing the sensorTask thread.
   * @param  argument: Not used
   * @retval None
   */
-void StartSensorTask(void *argument)
+/* USER CODE END Header_StartSensorTask */
+void StartMoistureTask(const void *argument)
 {
+  /* USER CODE BEGIN 5 */
   /* Infinite loop */
-  while(1){
-    /* Start the ADC conversion */
-    HAL_ADC_Start(&hadc1);
-    /* Poll for ADC conversion completion */
-    if(HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY) == HAL_OK){
-    	osMutexAcquire(moistureMutex1Handle, osWaitForever);
-		/* Get the ADC converted value */
-		moistureLevel = HAL_ADC_GetValue(&hadc1);
-		osMutexRelease(moistureMutex1Handle);
-    }
-    else{
-    	char error_msg[] = "ADC conversion failed!\r\n";
-    	HAL_UART_Transmit(&huart1, (uint8_t *)error_msg, strlen(error_msg), HAL_MAX_DELAY);
-    }
-    /* Stop the ADC conversion */
-    HAL_ADC_Stop(&hadc1);
-    /* Delay for 1 second */
-    HAL_Delay(1000);
+  while(1)
+  {
+	  char *str = "Moisture Task Started\n";
+	  HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), HAL_MAX_DELAY);
+	  HAL_ADC_Start(&hadc1);
+	  str = "ADC Conversion Started\n";
+	  HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), HAL_MAX_DELAY);
+	  if(HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY) == HAL_OK){
+		  moisture_level = HAL_ADC_GetValue(&hadc1);
+	  }
+	  else{
+		  str = "ADC Conversion Failed\n";
+		  HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), HAL_MAX_DELAY);
+	  }
+	  str = "Moisture Task Stopped\n";
+	  HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), HAL_MAX_DELAY);
+	  osDelay(2000);
   }
+  /* USER CODE END 5 */
 }
 
-/**
-  * @brief Function implementing the wateringTask thread.
-  * @param argument: Not used
-  * @retval None
-  */
-void StartWateringTask(void *argument)
+void StartWateringTask(const void *argument)
 {
+  /* USER CODE BEGIN 5 */
   /* Infinite loop */
-  while(1){
-    /* Check if moisture level is below threshold */
-	osMutexAcquire(moistureMutex1Handle, osWaitForever);
-	uint16_t threshold = moistureLevel;
-	osMutexRelease(moistureMutex1Handle);
-    if(threshold < 30){
-      /* Turn on the water pump */
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
-    } else {
-      /* Turn off the water pump */
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
-    }
-    /* Delay for 1 second */
-    HAL_Delay(1000);
+  while(1)
+  {
+	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+	  HAL_Delay(500);
+	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+	  HAL_Delay(500);
+	  char *str = "Watering Task Started\n";
+	  HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), HAL_MAX_DELAY);
+	  if(moisture_level < 1000){
+		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
+		  str = "Watering Pump Started\n";
+		  HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), HAL_MAX_DELAY);
+	  }
+	  else{
+		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
+		  str = "Watering Pump Stopped\n";
+		  HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), HAL_MAX_DELAY);
+	  }
+	  str = "Watering Task Stopped\n";
+	  HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), HAL_MAX_DELAY);
+	  osDelay(2000);
   }
+  /* USER CODE END 5 */
 }
 
-/**
-  * @brief Function implementing the canTask thread.
-  * @param argument: Not used
-  * @retval None
-  */
-void StartCanTask(void *argument)
+void StartCanTask(const void *argument)
 {
-  /* Set up CAN message header */
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
   TxHeader.DLC = 2;
   TxHeader.IDE = CAN_ID_STD;
+  TxHeader.StdId = 0x05;
   TxHeader.RTR = CAN_RTR_DATA;
-  TxHeader.StdId = 0x05; // Unique ID for Node 1
 
-  /* Infinite loop */
-  while(1){
-    /* Prepare CAN data */
-	osMutexAcquire(moistureMutex1Handle, osWaitForever);
-    TxData[0] = moistureLevel & 0xFF;
-    TxData[1] = (moistureLevel >> 8) & 0xFF;
-    osMutexRelease(moistureMutex1Handle);
-    /* Transmit CAN message */
-    HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox);
-    /* Delay for 1 second */
-    HAL_Delay(1000);
+  while(1)
+  {
+	  char *str = "CAN Task Started\n";
+	  HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), HAL_MAX_DELAY);
+  	  TxData[0] = moisture_level & 0xFF;
+  	  TxData[1] = (moisture_level >> 8) && 0xFF;
+	  HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox);
+	  osDelay(1000);
+	  str = "CAN Task Stopped\n";
+	  HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), HAL_MAX_DELAY);
   }
+  /* USER CODE END 5 */
+}
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM1 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
 }
 
 /**
@@ -334,11 +495,13 @@ void StartCanTask(void *argument)
   */
 void Error_Handler(void)
 {
-  /* Disable interrupts and enter an infinite loop */
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)
   {
   }
+  /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
@@ -351,7 +514,9 @@ void Error_Handler(void)
   */
 void assert_failed(uint8_t *file, uint32_t line)
 {
-  /* User can add their own implementation to report the file name and line number,
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (11.3.rel1)
+# Toolchain: GNU Tools for STM32 (12.3.rel1)
 ################################################################################
 
 -include ../makefile.init
@@ -80,6 +80,12 @@ default.size.stdout \
 OBJDUMP_LIST += \
 Node\ 2.list \
 
+OBJCOPY_HEX += \
+Node\ 2.hex \
+
+OBJCOPY_BIN += \
+Node\ 2.bin \
+
 
 # All Target
 all: main-build
@@ -103,12 +109,22 @@ Node\ 2.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+Node\ 2.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "Node 2.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
+Node\ 2.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "Node 2.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) Node\ 2.elf Node\ 2.list Node\ 2.map Node\\ 2.elf default.size.stdout
+	-$(RM) Node\ 2.bin Node\ 2.elf Node\ 2.hex Node\ 2.list Node\ 2.map Node\\ 2.elf default.size.stdout
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX) $(OBJCOPY_BIN)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

@@ -15,6 +15,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include <string.h>
+#include <stdio.h>
 
 #define RS_PIN GPIO_PIN_2
 #define EN_PIN GPIO_PIN_3
@@ -260,7 +261,7 @@ void LCD_Print(char *str)
 void StartCANReceiveTask(void *argument)
 {
   uint8_t RxData[2];
-  uint32_t RxFifo;
+  uint32_t RxFifo = CAN_RX_FIFO0;
   CAN_RxHeaderTypeDef RxHeader;
 
   while (1)
@@ -297,13 +298,13 @@ void StartLCDUpdateTask(void *argument)
   while (1)
   {
     osMutexAcquire(moistureLevel_1Handle, osWaitForever);
-    sprintf(buffer, "Moisture 1: %d", moisture_level_1);
+    sprintf(buffer, "M_1: %d", moisture_level_1);
     osMutexRelease(moistureLevel_1Handle);
     LCD_Command(0x80);
     LCD_Print(buffer);
 
     osMutexAcquire(moistureLevel_2Handle, osWaitForever);
-    sprintf(buffer, "Moisture 2: %d", moisture_level_2);
+    sprintf(buffer, "M_2: %d", moisture_level_2);
     osMutexRelease(moistureLevel_2Handle);
     LCD_Command(0xC0);
     LCD_Print(buffer);

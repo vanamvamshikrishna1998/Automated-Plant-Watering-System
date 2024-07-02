@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (11.3.rel1)
+# Toolchain: GNU Tools for STM32 (12.3.rel1)
 ################################################################################
 
 C++M_SRCS := 
@@ -24,7 +24,9 @@ C_UPPER_DEPS :=
 S_DEPS := 
 CXXM_DEPS := 
 C_DEPS := 
+OBJCOPY_BIN := 
 CC_DEPS := 
+OBJCOPY_HEX := 
 SIZE_OUTPUT := 
 C++_DEPS := 
 SU_FILES := 
